@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Otherworld Colony",
+    "slug": "otherworld-colony",
+    "version": "0.2.0",
+    "orientation": "landscape",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#05080f",
+    "ios": {
+      "supportsTablet": true,
+      "requireFullScreen": true
+    },
+    "android": {
+      "package": "com.litecoin.otherworldcolony",
+      "versionCode": 3,
+      "adaptiveIcon": {
+        "backgroundColor": "#0E1A33",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "plugins": [
+      "expo-asset",
+      [
+        "expo-navigation-bar",
+        {
+          "hidden": true,
+          "style": "light"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#070b1c"
+        }
+      ]
+    ],
+    "extra": {
+      "expo-navigation-bar": {
+        "style": "light",
+        "hidden": true
+      },
+      "eas": {
+        "projectId": "d28475c3-0db6-4f39-9411-334fa1ada906"
+      }
+    },
+    "owner": "litecoin"
+  }
+}

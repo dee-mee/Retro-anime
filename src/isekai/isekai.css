@@ -1,0 +1,1041 @@
+/* The isekai build's whole interface. The colony's own HUD is switched off in this mode. */
+
+body.isekai .hud,
+body.isekai .label-layer {
+  display: none !important;
+}
+
+body.isekai {
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.ik {
+  --sys: #7fd8ff;
+  --sys-dim: rgba(127, 216, 255, 0.35);
+  --panel: rgba(8, 18, 38, 0.78);
+  --panel-solid: rgba(8, 18, 38, 0.94);
+  --ink: #eaf6ff;
+  --ink-dim: #9fb6cc;
+  --hp: #ff5a6e;
+  --mp: #4ea4ff;
+  --xp: #ffd75a;
+  --gold: #ffd36a;
+  --good: #7cf0a8;
+  --warn: #ff8a5a;
+  --safe-l: max(14px, env(safe-area-inset-left));
+  --safe-r: max(14px, env(safe-area-inset-right));
+  --safe-t: max(10px, env(safe-area-inset-top));
+  --safe-b: max(12px, env(safe-area-inset-bottom));
+
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  color: var(--ink);
+  font: 500 13px/1.35 system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.ik * {
+  box-sizing: border-box;
+}
+.ik button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── touch layer: left half steers, right half looks ─────────────────────────────── */
+
+.ik-touch {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.ik-stick {
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  margin: -64px 0 0 -64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(127, 216, 255, 0.1), rgba(127, 216, 255, 0.04) 70%);
+  border: 2px solid var(--sys-dim);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.ik-stick.on {
+  opacity: 1;
+}
+.ik-stick.idle {
+  opacity: 0.45;
+}
+.ik-stick i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d8f4ff, #5fb8e8 60%, #2a6c9a);
+  box-shadow: 0 0 18px rgba(127, 216, 255, 0.6);
+}
+
+/* ── panels ───────────────────────────────────────────────────────────────────────── */
+
+.ik-panel {
+  background: var(--panel);
+  border: 1px solid var(--sys-dim);
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3), 0 0 16px rgba(127, 216, 255, 0.12) inset;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ik-hero {
+  position: absolute;
+  left: var(--safe-l);
+  top: var(--safe-t);
+  width: 236px;
+  padding: 8px 10px 9px;
+  pointer-events: auto;
+}
+.ik-hero .who {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.ik-hero .lv {
+  font-weight: 800;
+  color: var(--sys);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.ik-hero .name {
+  font-weight: 700;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ik-bar {
+  position: relative;
+  height: 11px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-top: 4px;
+}
+.ik-bar > i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  border-radius: 6px;
+  transition: width 0.2s;
+}
+.ik-bar > span {
+  position: absolute;
+  inset: 0;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 11px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+.ik-bar.hp > i {
+  background: linear-gradient(90deg, #ff3b5c, #ff8a8a);
+}
+.ik-bar.mp > i {
+  background: linear-gradient(90deg, #3a7bff, #7ec8ff);
+}
+.ik-bar.xp {
+  height: 5px;
+}
+.ik-bar.xp > i {
+  background: linear-gradient(90deg, #f5b52a, #ffe680);
+}
+
+.ik-track {
+  position: absolute;
+  left: var(--safe-l);
+  top: calc(var(--safe-t) + 84px);
+  width: 236px;
+  padding: 7px 10px;
+  pointer-events: auto;
+  font-size: 12px;
+}
+.ik-track:empty {
+  display: none;
+}
+.ik-track .q {
+  margin: 2px 0;
+}
+.ik-track .q b {
+  color: var(--xp);
+  font-weight: 700;
+}
+.ik-track .q.done b {
+  color: var(--good);
+}
+.ik-track .q small {
+  display: block;
+  color: var(--ink-dim);
+  font-size: 11px;
+}
+
+.ik-topright {
+  position: absolute;
+  right: var(--safe-r);
+  top: var(--safe-t);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: auto;
+}
+.ik-gold {
+  padding: 4px 10px;
+  font-weight: 800;
+  color: var(--gold);
+  font-size: 13px;
+}
+.ik-menu {
+  display: flex;
+  gap: 5px;
+}
+.ik-menu button {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: var(--panel);
+  border: 1px solid var(--sys-dim);
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+}
+.ik-menu button:active {
+  background: rgba(127, 216, 255, 0.25);
+}
+.ik-minimap {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  border: 2px solid var(--sys-dim);
+  background: rgba(8, 18, 38, 0.6);
+  display: block;
+}
+
+.ik-region {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--safe-t) + 2px);
+  transform: translateX(-50%);
+  padding: 3px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--sys);
+  white-space: nowrap;
+}
+
+/* ── action buttons ───────────────────────────────────────────────────────────────── */
+
+.ik-actions {
+  position: absolute;
+  right: var(--safe-r);
+  bottom: var(--safe-b);
+  width: 250px;
+  height: 210px;
+  pointer-events: none;
+}
+.ik-btn {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--sys-dim);
+  background: radial-gradient(circle at 40% 30%, rgba(60, 110, 160, 0.85), rgba(10, 24, 48, 0.88));
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  touch-action: none;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.06s;
+}
+.ik-btn.down {
+  transform: scale(0.92);
+  border-color: var(--sys);
+}
+.ik-btn .ico {
+  font-size: 22px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+.ik-btn .lbl {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  z-index: 2;
+  text-shadow: 0 1px 2px #000;
+}
+.ik-btn .cd {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background: conic-gradient(rgba(0, 0, 0, 0.65) var(--p, 0%), transparent 0);
+}
+.ik-btn.locked {
+  filter: grayscale(1) brightness(0.55);
+}
+.ik-btn.nomp .ico {
+  opacity: 0.45;
+}
+.ik-btn .count {
+  position: absolute;
+  top: 3px;
+  right: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  z-index: 2;
+}
+
+.ik-btn.attack {
+  width: 86px;
+  height: 86px;
+  right: 6px;
+  bottom: 6px;
+  background: radial-gradient(circle at 40% 30%, rgba(255, 140, 90, 0.9), rgba(120, 30, 20, 0.92));
+  border-color: rgba(255, 180, 140, 0.7);
+}
+.ik-btn.attack .ico {
+  font-size: 34px;
+}
+.ik-btn.s0 { width: 56px; height: 56px; right: 104px; bottom: 4px; }
+.ik-btn.s1 { width: 56px; height: 56px; right: 96px; bottom: 70px; }
+.ik-btn.s2 { width: 56px; height: 56px; right: 44px; bottom: 112px; }
+.ik-btn.s3 { width: 50px; height: 50px; right: 168px; bottom: 30px; }
+.ik-btn.dash { width: 50px; height: 50px; right: 0; bottom: 104px; }
+.ik-btn.potion { width: 44px; height: 44px; right: 160px; bottom: 92px; }
+
+.ik-interact {
+  position: absolute;
+  right: calc(var(--safe-r) + 120px);
+  bottom: calc(var(--safe-b) + 170px);
+  padding: 10px 16px;
+  border-radius: 22px;
+  border: 2px solid var(--xp);
+  background: rgba(40, 30, 6, 0.85);
+  color: #fff3c4;
+  font-weight: 800;
+  font-size: 14px;
+  pointer-events: auto;
+  white-space: nowrap;
+  display: none;
+  box-shadow: 0 0 18px rgba(255, 215, 90, 0.35);
+  animation: ik-pulse 1.4s ease-in-out infinite;
+}
+.ik-interact.on {
+  display: block;
+}
+@keyframes ik-pulse {
+  50% {
+    box-shadow: 0 0 28px rgba(255, 215, 90, 0.6);
+  }
+}
+
+/* ── floating world text ──────────────────────────────────────────────────────────── */
+
+.ik-float {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ik-dmg {
+  position: absolute;
+  font-weight: 900;
+  font-size: 18px;
+  color: #fff;
+  text-shadow: 0 0 3px #000, 0 2px 4px #000;
+  transform: translate(-50%, -50%);
+  animation: ik-rise 0.9s ease-out forwards;
+  white-space: nowrap;
+}
+.ik-dmg.crit {
+  font-size: 24px;
+  color: #ffdf5a;
+}
+.ik-dmg.hurt {
+  color: #ff6a7a;
+}
+.ik-dmg.heal {
+  color: var(--good);
+}
+.ik-dmg.xp {
+  color: var(--xp);
+  font-size: 13px;
+}
+.ik-dmg.gold {
+  color: var(--gold);
+  font-size: 13px;
+}
+@keyframes ik-rise {
+  0% {
+    opacity: 0;
+    margin-top: 6px;
+    scale: 0.6;
+  }
+  15% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  30% {
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    margin-top: -46px;
+  }
+}
+.ik-mbar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46px;
+  height: 5px;
+  margin-left: -23px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+.ik-mbar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff3b5c, #ff8a6a);
+}
+.ik-boss {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--safe-t) + 30px);
+  width: min(440px, 46vw);
+  transform: translateX(-50%);
+  padding: 6px 12px 8px;
+  display: none;
+  pointer-events: none;
+}
+.ik-boss.on {
+  display: block;
+}
+.ik-boss .nm {
+  font-weight: 800;
+  font-size: 13px;
+  color: #ffb0b0;
+  text-align: center;
+  letter-spacing: 0.06em;
+}
+.ik-boss .ik-bar {
+  height: 10px;
+}
+.ik-tag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -100%;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 8px;
+  background: rgba(8, 18, 38, 0.7);
+  white-space: nowrap;
+}
+.ik-tag.quest {
+  color: #ffe27a;
+}
+
+/* ── banners and toasts ───────────────────────────────────────────────────────────── */
+
+.ik-banner {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+}
+.ik-banner.on {
+  animation: ik-banner 2.6s ease-out forwards;
+}
+.ik-banner h2 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 0 12px var(--sys), 0 0 30px rgba(127, 216, 255, 0.6), 0 3px 6px #000;
+}
+.ik-banner p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--sys);
+  text-shadow: 0 2px 4px #000;
+}
+@keyframes ik-banner {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+  20% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.ik-toasts {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-b) + 8px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+.ik-toast {
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  animation: ik-toast 3s ease forwards;
+}
+@keyframes ik-toast {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  10%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.ik-hurt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 90px rgba(255, 30, 50, 0.75);
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.ik-hurt.on {
+  opacity: 1;
+  transition: none;
+}
+
+/* ── dialogue ─────────────────────────────────────────────────────────────────────── */
+
+.ik-dialog {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  bottom: var(--safe-b);
+  transform: translateX(-50%);
+  width: min(640px, 72vw);
+  padding: 12px 16px 12px;
+  pointer-events: auto;
+  display: none;
+  background: var(--panel-solid);
+}
+.ik-dialog.on {
+  display: block;
+}
+.ik-dialog .nm {
+  position: absolute;
+  top: -15px;
+  left: 14px;
+  padding: 3px 12px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #2a6c9a, #1b3c66);
+  border: 1px solid var(--sys);
+  font-weight: 800;
+  font-size: 13px;
+}
+.ik-dialog .nm small {
+  font-weight: 500;
+  color: var(--ink-dim);
+  margin-left: 6px;
+}
+.ik-dialog .tx {
+  margin-top: 6px;
+  min-height: 40px;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.ik-dialog .ch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.ik-choice,
+.ik-w button.act {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--sys);
+  background: rgba(127, 216, 255, 0.12);
+  font-weight: 700;
+  font-size: 13px;
+}
+.ik-choice:active,
+.ik-w button.act:active {
+  background: rgba(127, 216, 255, 0.3);
+}
+.ik-choice.primary,
+.ik-w button.act.primary {
+  background: linear-gradient(180deg, #3aa0e0, #1d5f9a);
+  border-color: #aee6ff;
+}
+.ik-choice[disabled],
+.ik-w button.act[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── windows: status, quests, bag, map, shop, settings ────────────────────────────── */
+
+.ik-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  place-items: center;
+  background: rgba(2, 6, 16, 0.45);
+  pointer-events: auto;
+}
+.ik-modal.on {
+  display: grid;
+}
+.ik-w {
+  width: min(620px, 86vw);
+  max-height: calc(100vh - 28px);
+  overflow: auto;
+  padding: 14px 18px 16px;
+  background: var(--panel-solid);
+  border: 1px solid var(--sys);
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(127, 216, 255, 0.25), 0 0 0 1px rgba(127, 216, 255, 0.15) inset;
+  position: relative;
+}
+.ik-w h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  text-align: center;
+  color: var(--sys);
+  text-shadow: 0 0 10px rgba(127, 216, 255, 0.6);
+}
+.ik-w .x {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--sys-dim);
+  background: transparent;
+  font-size: 15px;
+}
+.ik-w .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 22px;
+}
+.ik-w .row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(127, 216, 255, 0.1);
+}
+.ik-w .row span:first-child {
+  color: var(--ink-dim);
+}
+.ik-w .row b {
+  font-weight: 700;
+}
+.ik-w .sec {
+  margin: 12px 0 5px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--sys);
+}
+.ik-w .item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  margin: 4px 0;
+  border-radius: 8px;
+  background: rgba(127, 216, 255, 0.06);
+}
+.ik-w .item .grow {
+  flex: 1;
+  min-width: 0;
+}
+.ik-w .item small {
+  display: block;
+  color: var(--ink-dim);
+}
+.ik-w .item.locked {
+  opacity: 0.45;
+}
+.ik-w .item.cleared {
+  border-left: 3px solid var(--good);
+}
+.ik-w .item.here {
+  border-left: 3px solid var(--sys);
+}
+.ik-w .muted {
+  color: var(--ink-dim);
+  text-align: center;
+  padding: 12px 0;
+}
+.ik-w input[type='text'] {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--sys);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+  font: 600 16px system-ui, sans-serif;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.ik-w .seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ik-w .seg button {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--sys-dim);
+  background: transparent;
+  font-size: 12px;
+}
+.ik-w .seg button.on {
+  border-color: var(--sys);
+  background: rgba(127, 216, 255, 0.22);
+}
+
+/* ── intro, fades, the rotate nag ─────────────────────────────────────────────────── */
+
+.ik-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+.ik-fade.white {
+  background: #f4fbff;
+}
+.ik-fade.on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ik-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  place-items: center;
+  background: radial-gradient(ellipse at center, #0e1a33 0%, #02040a 70%);
+  pointer-events: auto;
+  text-align: center;
+  padding: 24px;
+}
+.ik-intro.on {
+  display: grid;
+}
+.ik-intro .line {
+  max-width: 640px;
+  font-size: 19px;
+  line-height: 1.6;
+  color: #dcecff;
+  text-shadow: 0 0 12px rgba(127, 216, 255, 0.4);
+  min-height: 3.2em;
+}
+.ik-intro .line em {
+  color: var(--xp);
+  font-style: normal;
+  font-weight: 700;
+}
+.ik-intro .hint {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--ink-dim);
+  animation: ik-blink 1.6s ease-in-out infinite;
+}
+.ik-intro .skip {
+  position: absolute;
+  top: var(--safe-t);
+  right: var(--safe-r);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--sys-dim);
+  background: transparent;
+  font-size: 12px;
+}
+.ik-intro .title {
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-shadow: 0 0 22px var(--sys), 0 0 50px rgba(127, 216, 255, 0.5);
+  margin-bottom: 6px;
+}
+.ik-intro .sub {
+  color: var(--sys);
+  letter-spacing: 0.3em;
+  font-size: 12px;
+  margin-bottom: 26px;
+}
+@keyframes ik-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.ik-rotate {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  text-align: center;
+  background: #050a16;
+  pointer-events: auto;
+  font-size: 16px;
+  padding: 30px;
+}
+@media (orientation: portrait) and (pointer: coarse) {
+  .ik-rotate {
+    display: grid;
+  }
+}
+
+/* Short landscape phones: tighten everything a notch. */
+@media (max-height: 420px) {
+  .ik-hero,
+  .ik-track {
+    width: 206px;
+  }
+  .ik-track {
+    top: calc(var(--safe-t) + 78px);
+  }
+  .ik-minimap {
+    width: 92px;
+    height: 92px;
+  }
+  .ik-menu button {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  .ik-actions {
+    transform: scale(0.88);
+    transform-origin: right bottom;
+  }
+  .ik-interact {
+    bottom: calc(var(--safe-b) + 150px);
+  }
+  .ik-dialog .tx {
+    font-size: 13.5px;
+  }
+}
+.ik-region:empty {
+  display: none;
+}
+.ik-intro .emblem {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.ik-intro .emblem svg {
+  width: 150px;
+  height: 150px;
+  border-radius: 30px;
+  box-shadow: 0 0 40px rgba(127, 216, 255, 0.25);
+}
+@media (max-height: 420px) {
+  .ik-intro .emblem svg {
+    width: 96px;
+    height: 96px;
+    border-radius: 20px;
+  }
+  .ik-intro .title {
+    font-size: 30px;
+  }
+  .ik-intro .sub {
+    margin-bottom: 14px;
+  }
+}
+
+/* ── 【System】 messages ──────────────────────────────────────────────────────────── */
+
+.ik-system {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--safe-t) + 64px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 15;
+}
+.ik-system .msg {
+  padding: 7px 16px;
+  border: 1px solid var(--sys);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(14, 40, 80, 0.92), rgba(8, 20, 44, 0.92));
+  color: #e6f6ff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 18px rgba(127, 216, 255, 0.35);
+  animation: ik-sys 4.2s ease forwards;
+  white-space: nowrap;
+  max-width: 80vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ik-system .msg b {
+  color: var(--sys);
+}
+@keyframes ik-sys {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+  8% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── the old-anime episode card ─────────────────────────────────────────────────────── */
+
+.ik-episode {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 25;
+}
+.ik-episode.on {
+  animation: ik-ep 3.2s ease forwards;
+}
+.ik-episode .band {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 38%;
+  height: 24%;
+  background: repeating-linear-gradient(-12deg, #c8202a 0 22px, #e8323c 22px 44px);
+  transform: rotate(-4deg);
+  box-shadow: 0 6px 0 #1a0a0a, 0 -6px 0 #1a0a0a;
+}
+.ik-episode .no,
+.ik-episode .ttl {
+  position: relative;
+  font-family: Impact, 'Arial Black', system-ui, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+  color: #ffe04a;
+  -webkit-text-stroke: 2px #1a0a0a;
+  text-shadow: 4px 4px 0 #1a0a0a;
+}
+.ik-episode .no {
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  color: #fff;
+}
+.ik-episode .ttl {
+  font-size: min(54px, 8vw);
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  text-align: center;
+  padding: 0 4vw;
+}
+@keyframes ik-ep {
+  0% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.ik-w textarea.ik-code {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--sys);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--ink);
+  font: 11px/1.3 ui-monospace, monospace;
+  -webkit-user-select: text;
+  user-select: text;
+  word-break: break-all;
+}

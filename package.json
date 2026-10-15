@@ -1,0 +1,55 @@
+{
+  "name": "otherworld-colony",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A retro-anime isekai action RPG for Android, built with three.js.",
+  "license": "MIT",
+  "author": "dee-mee",
+  "homepage": "https://github.com/dee-mee/Retro-anime",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dee-mee/Retro-anime.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dee-mee/Retro-anime/issues"
+  },
+  "keywords": [
+    "isekai",
+    "anime",
+    "rpg",
+    "three.js",
+    "webgl",
+    "android",
+    "expo",
+    "game"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "os": [
+    "darwin",
+    "win32",
+    "linux"
+  ],
+  "scripts": {
+    "dev": "npm run assets --silent && vite",
+    "build": "npm run assets --silent && vite build",
+    "start": "vite build && node server/serve.mjs",
+    "serve": "node server/serve.mjs",
+    "assets": "node tools/build-assets.mjs",
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "dev:isekai": "npm run assets --silent && vite --mode isekai",
+    "build:isekai": "npm run assets --silent && vite build --mode isekai"
+  },
+  "dependencies": {
+    "@mdi/js": "^7.4.47",
+    "three": "^0.185.0"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.4.2",
+    "@gltf-transform/functions": "^4.4.2",
+    "@resvg/resvg-js": "^2.6.2",
+    "vite": "^7.1.0"
+  }
+}
